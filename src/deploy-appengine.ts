@@ -100,25 +100,27 @@ export async function run(): Promise<void> {
         throw new Error(message);
       }
     }
+    logInfo('start')
     
     // Add environment variables to the yaml
     for (const deliverable of allDeliverables) {
       const file = fs.readFileSync(deliverable, 'utf8')
       const parsedDeliverable = YAML.parse(file)
-
+      logInfo('read ' + deliverable + file)
       const parsedEnvVariablesInput = (envVariables || '').split(',').reduce((acc, cur) => {
-          if (!cur) return acc
-          
-          const [key, value] = cur.split('=');
-          
-          return { ...acc, [key]: value }
+        if (!cur) return acc
+        
+        const [key, value] = cur.split('=');
+        
+        return { ...acc, [key]: value }
       }, {})
-
-
+      
+      
       parsedDeliverable.env_variables = { ...parsedDeliverable.env_variables, ...parsedEnvVariablesInput }
-
+      
       if (!Object.keys(parsedDeliverable.env_variables).length) delete parsedDeliverable.env_variables
-
+      
+      logInfo('yaz ' + deliverable + YAML.stringify(parsedDeliverable))
       fs.writeFileSync(deliverable, YAML.stringify(parsedDeliverable))
     }
 
@@ -178,7 +180,7 @@ export async function run(): Promise<void> {
 
     const options = { silent: true, ignoreReturnCode: true };
     const commandString = `${toolCommand} ${appDeployCmd.join(' ')}`;
-    logInfo(`Running: ${commandString}`);
+    logInfo(`Running2: ${commandString}`);
 
     // Get output of gcloud cmd.
     const output = await getExecOutput(toolCommand, appDeployCmd, options);
